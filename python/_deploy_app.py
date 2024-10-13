@@ -5,13 +5,6 @@ from vertexai.preview import reasoning_engines
 from dotenv import load_dotenv
 import requests
 
-# Tools =======================================================================
-# from search_tools import wikipedia, vertexai_search, exchange_rate
-# from search_tools.wikipedia import query as wikipedia_query
-# from search_tools.vertexai_search import query as search_google_merch_shop_query
-# from search_tools.exchange_rate import query as exchange_rate_query
-# =============================================================================
-
 load_dotenv("/opt/env/.env")
 
 GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID")
@@ -69,10 +62,15 @@ def get_agent():
       "top_k": None,
     },
     tools = [
-      # search_google_merch_shop_query,
       currency_query,
-      # wikipedia_query,
     ],
+    model_tool_kwargs = {
+      "tool_config": {
+        "function_calling_config": {
+          "mode": "ANY",
+        },
+      },
+    },
     agent_executor_kwargs={"return_intermediate_steps": True},
   )
 
@@ -113,7 +111,6 @@ if __name__ == "__main__":
       print("Please provide a resource ID for deletion")
   elif args.command == "test":
     agent = get_agent()
-    # print(agent.query(input="Google Bike Enamel Pin. Where can I buy it? Write the answer in plaintext."))
     query_1 = agent.query(input="What is the exchange rate between SGD and MYR.")
     print(f"query 1 input: {query_1['input']}")
     print(f"query 1 input: {query_1['output']}")
