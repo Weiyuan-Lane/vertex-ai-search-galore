@@ -3,12 +3,12 @@ services:
     platform: linux/amd64
     build:
       context: .
-      dockerfile: python/Dockerfile
+      dockerfile: python-setup/Dockerfile
     working_dir: /opt/setup
     container_name: gcloud_python_box
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
     volumes:
-      - ./python:/opt/setup/
+      - ./python-setup:/opt/setup/
       - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
       - .env:/opt/env/.env:ro

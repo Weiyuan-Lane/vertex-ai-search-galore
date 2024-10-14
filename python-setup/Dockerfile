@@ -5,7 +5,7 @@ ARG VENV_DIR=/opt/venv
 ENV CRC32C_PURE_PYTHON=1
 
 WORKDIR $WORKDIR
-COPY ./python/requirements.txt $WORKDIR
+COPY ./python-setup/requirements.txt $WORKDIR
 
 RUN apk add --no-cache python3 python3-dev py3-pip build-base geos-dev geos crc32c && \
     python3 -m venv $VENV_DIR && \

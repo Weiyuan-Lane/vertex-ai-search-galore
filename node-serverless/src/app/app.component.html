@@ -1,0 +1,88 @@
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
+<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<div class="page">
+  <div class="marvel-device nexus5">
+    <div class="top-bar"></div>
+    <div class="sleep"></div>
+    <div class="volume"></div>
+    <div class="camera"></div>
+    <div class="screen">
+      <div class="screen-container">
+        <div class="status-bar">
+          <div class="time"></div>
+          <div class="battery">
+            <i class="zmdi zmdi-battery"></i>
+          </div>
+          <div class="network">
+            <i class="zmdi zmdi-network"></i>
+          </div>
+          <div class="wifi">
+            <i class="zmdi zmdi-wifi-alt-2"></i>
+          </div>
+          <div class="star">
+            <i class="zmdi zmdi-star"></i>
+          </div>
+        </div>
+        <div class="chat">
+          <div class="chat-container">
+            <div class="user-bar">
+              <div class="back">
+                <i class="zmdi zmdi-arrow-left"></i>
+              </div>
+              <div class="avatar">
+                <img src="/assets/gemini-logo.webp" alt="Avatar">
+              </div>
+              <div class="name">
+                <span>Gemini</span>
+                <span class="status">online</span>
+              </div>
+              <div class="actions more">
+                <i class="zmdi zmdi-more-vert"></i>
+              </div>
+              <div class="actions attachment">
+                <i class="zmdi zmdi-attachment-alt"></i>
+              </div>
+              <div class="actions">
+                <i class="zmdi zmdi-phone"></i>
+              </div>
+            </div>
+            <div class="conversation">
+              <div class="conversation-container" #scroll>
+                <app-messages
+                  [messages]=messages
+                ></app-messages>
+                <div style="margin-top: 10px; float: left;" *ngIf="loaderStatus">
+                  <mat-spinner
+                    [color]="'accent'"
+                    [diameter]="40">
+                  </mat-spinner>
+                </div>
+              </div>
+              <app-message-input
+                (sendMessageEvent)="sendMessage($event)"
+              ></app-message-input>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+
+<router-outlet />
