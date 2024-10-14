@@ -31,25 +31,6 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-// Let's test and play with the following translations
-//
-//  Tôi ở đây với bánh của bạn, cho tôi vào nhé. - pie/cake
-//  Tôi ở đây với banh của bạn, cho tôi vào nhé. - balls
-//
-//  Alternate
-//
-//  Tôi đến đây để giao bánh cho bạn - pie/cake
-//  Tôi đến đây để giao banh cho bạn - balls
-//
-//  bạn xuống lấy bánh tôi tới rồi - pie/cake
-//  bạn xuống lấy banh tôi tới rồi - balls
-//
-//  bánh mè - pie/cake
-//  banh mè - balls
-//
-//  giao mì cho bạn
-//  giao mi cho ban
-//
 app.post('/translate-for-food', async (req, res) => {
   if (!req.body.message) {
     return res.status(400).json({ error: 'Missing message parameter' });
