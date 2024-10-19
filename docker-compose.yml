@@ -1,11 +1,11 @@
 services:
-  gcloud_python_box:
+  python-setup:
     platform: linux/amd64
     build:
       context: .
       dockerfile: python-setup/Dockerfile
     working_dir: /opt/setup
-    container_name: gcloud_python_box
+    container_name: python-setup
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
     volumes:

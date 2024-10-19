@@ -13,8 +13,12 @@ node-serverless/bazel-out
 # Node
 node-serverless/server/node_modules
 node-serverless/node_modules
-npm-debug.log
-yarn-error.log
+node-serverless/server/config/env.js
+node-serverless/server/npm-debug.log
+node-serverless/npm-debug.log
+node-serverless/server/yarn-error.log
+node-serverless/yarn-error.log
+
 
 # IDEs and editors
 .idea/

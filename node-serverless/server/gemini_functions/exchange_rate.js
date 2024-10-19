@@ -21,14 +21,19 @@ const getExchangeRateFunctionDeclaration = {
 };
 
 async function getExchangeRate(currencyFrom, currencyTo) {
-  const response = await axios.get('https://api.frankfurter.app/latest', {
-    params: {
-      base: currencyFrom,
-      symbols: currencyTo
-    }
-  });
+  try {
+    const response = await axios.get('https://api.frankfurter.app/latest', {
+      params: {
+        base: currencyFrom,
+        symbols: currencyTo
+      }
+    });
 
-  return response.data;
+    return response.data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
 
 module.exports = {

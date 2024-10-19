@@ -1,59 +1,85 @@
 const {VertexAI} = require('@google-cloud/vertexai');
+const env = require('./config/env');
+const path = require('path');
+const marked = require('marked');
+
+// Init express for this node server
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// HTML Content
+app.use(express.static(path.join(__dirname, '../dist/chat-with-gemini/browser')));
+
+app.get('*', (_, res) => {
+  res.sendFile(path.join(__dirname, '../dist/chat-with-gemini/browser/index.html'));
+});
+
+const port = env.PORT;
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
+
+/*****************************************************************************
+ * All Vertex AI related code will be added below this comment block         *
+ *****************************************************************************/
+
 const {
-  translateWithFoodContextFunctionDeclaration,
-  translateWithFoodContextEmptyResponseCall,
-} = require('./gemini_functions/translate');
+  googleMerchStoreSearchDeclaration,
+  googleMerchStoreSearch,
+} = require('./gemini_functions/vertexai_google_merch_store_search');
+const {
+  getExchangeRateFunctionDeclaration,
+  getExchangeRate,
+} = require('./gemini_functions/exchange_rate');
+const {
+  getWikipediaContentFunctionDeclaration,
+  getWikipediaContent,
+} = require('./gemini_functions/wikipedia');
+
+
+const INVALID_RESULTS_MESSAGE = 'No results were found';
+
+app.post('/search', async (req, res) => {
+  try {
+    const query = req.body.message;
+    if (!query || query === '') {
+      return res.status(400).json({ error: 'Missing message parameter' });
+    }
+
+    // // Main post request to the search endpoint *******************************
+    const searchResponse = await searchWithNode(query);
+    res.status(200).send({
+      message: searchResponse.message,
+      results: searchResponse.results,
+    });
+    //*************************************************************************
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Internal Server Error'});
+  }
+});
 
 // Initialize Vertex with your Cloud project and location
-const vertex_ai = new VertexAI({project: 'trygcp-ai-new', location: 'us-central1'});
-const proModel = 'gemini-1.0-pro-001';
-const flashModel = 'gemini-1.5-flash-001';
-
-const express = require('express');
-const marked = require('marked');
-const app = express();
-app.use(express.json())
-const port = 8080;
-const path = require('path');
-
-
-// Chat implementation
-app.post('/chat', async (req, res) => {
-  try {
-    const chatResponse = await sendMessageStream(req.body.message);
-    const parsedResponse = marked.parse(chatResponse);
-    res.status(200).send({
-      message: parsedResponse,
-    });
-  } catch (e) {
-    console.error(e);
-    res.status(500).send('Internal Server Error');
-  }
+const vertex_ai = new VertexAI({
+  project: env.GOOGLE_CLOUD_PROJECT,
+  location: env.GOOGLE_CLOUD_LOCATION
 });
 
-app.post('/translate-for-food', async (req, res) => {
-  if (!req.body.message) {
-    return res.status(400).json({ error: 'Missing message parameter' });
-  }
-  if (!req.body.srcLang) {
-    return res.status(400).json({ error: 'Missing srcLang parameter' });
-  }
-  if (!req.body.destLang) {
-    return res.status(400).json({ error: 'Missing destLang parameter' });
-  };
+const searchEngineModel = vertex_ai.getGenerativeModel({
+  model: env.GEMINI_MODEL,
+  systemInstruction: {
+    role: 'system',
+    parts: [{
+      'text': `
+        You are a search engine.
 
-  try {
-    const jsonResponse = await translateWithFoodContext(req.body.message, req.body.srcLang, req.body.destLang);
-    res.status(200).json(jsonResponse);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// Instantiate the models
-const generativeModel = vertex_ai.preview.getGenerativeModel({
-  model: proModel,
+        Please return the most relevant search results for the given query.
+        If the user tries to chat with you, return the message '${INVALID_RESULTS_MESSAGE}'.
+      `,
+    }]
+  },
   generationConfig: {
     'maxOutputTokens': 2048,
     'temperature': 1,
@@ -79,101 +105,139 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
   ],
 });
 
-const chat = generativeModel.startChat({});
+// Implemented search logic with Gemini model
+const searchTools = {
+  function_declarations: [
+    googleMerchStoreSearchDeclaration,
+    getExchangeRateFunctionDeclaration,
+    getWikipediaContentFunctionDeclaration,
+  ],
+};
 
-async function sendMessageStream(message) {
-  const result = await chat.sendMessageStream([
-    { text: 'Talk like Ryan Reynolds' },
-    { text: message }
-  ]);
-  let output = '';
-  for await (const item of result.stream) {
-    const text = item.candidates[0].content.parts[0].text;
-    output = `${output}${text}`;
+async function searchWithNode(query) {
+  // 1. Initial search logic
+  const request = {
+    contents: [{
+      role: 'user',
+      parts: [{
+        text: query,
+      }]
+    }],
+    tools: [
+      searchTools,
+    ],
+  };
+
+  // 2. Extracting the search results
+  const { output, searchResults } = await searchEngineGenerateContent({
+    request,
+    firstCall: true,
+  });
+
+  // 3. Return the search results
+  const markedOutput = marked.parse(output);
+  return {
+    message: markedOutput,
+    results: searchResults,
   }
-
-  return output;
 }
 
-// See a sample here: https://github.com/GoogleCloudPlatform/nodejs-docs-samples/blob/main/generative-ai/snippets/function-calling/functionCallingBasic.js
-async function translateWithFoodContext(message, srcLang, targetLang) {
-  const generativeModelWithFunctionCalling = vertex_ai.preview.getGenerativeModel({
-    model: proModel,
-    generationConfig: {
-      'maxOutputTokens': 2048,
-      'temperature': 1,
-      'topP': 0.95,
-    },
-    safetySettings: [
-      {
-          'category': 'HARM_CATEGORY_HATE_SPEECH',
-          'threshold': 'BLOCK_NONE'
-      },
-      {
-          'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-          'threshold': 'BLOCK_NONE'
-      },
-      {
-          'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-          'threshold': 'BLOCK_NONE'
-      },
-      {
-          'category': 'HARM_CATEGORY_HARASSMENT',
-          'threshold': 'BLOCK_NONE'
-      }
-    ],
-  });
+function isFunctionCall(candidates) {
+  return candidates?.length > 0 &&
+    candidates[0]?.content?.parts?.length > 0 &&
+    !!(candidates[0].content.parts[0]?.functionCall?.name);
+}
 
-  const result = await generativeModelWithFunctionCalling.generateContent({
-    contents: [
-      {
-        role: 'user',
-        parts: [{
-          text: `Translate this message "${message}", from "${srcLang}" to "${targetLang}", and return the translated text.`,
-        }, {
-          text: 'You are a delivery driver delivering all kinds of food. Please correct typos if there are before translating'
-        }]
-      },
-    ],
-    tools: [
-      {
-        function_declarations: [translateWithFoodContextFunctionDeclaration],
-      }
-    ],
-    tool_config: {
-      function_calling_config: {
-        mode: 'ANY',
-        allowed_function_names: [translateWithFoodContextFunctionDeclaration.name],
-      },
+async function functionCallLogic(priorRequest, candidates) {
+  let output = INVALID_RESULTS_MESSAGE, searchResults = [];
+  let request = priorRequest;
+
+  // Single function calling
+  if (candidates.length === 1) {
+    const functionCallObj = candidates[0].content.parts[0].functionCall;
+    const functionCallName = functionCallObj.name;
+    const functionCallArgs = functionCallObj.args;
+    request.contents.push({
+      role: 'model',
+      parts: [{ functionCall: functionCallObj }],
+    });
+
+    switch (functionCallName) {
+      case googleMerchStoreSearchDeclaration.name:
+        searchResults = await googleMerchStoreSearch(functionCallArgs.productName, functionCallArgs.productDescription);
+        output = `Found ${searchResults.length} results for ${functionCallArgs.productName} and ${functionCallArgs.productDescription}`;
+        break;
+
+      case getExchangeRateFunctionDeclaration.name:
+        const exchangeRateData = await getExchangeRate(functionCallArgs.currency_from, functionCallArgs.currency_to);
+        if (!exchangeRateData) {
+          break;
+        }
+
+        request.contents.push({
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: getExchangeRateFunctionDeclaration.name,
+                response: {name: getExchangeRateFunctionDeclaration.name, content: exchangeRateData},
+              },
+            },
+          ]
+        });
+        ({ output, searchResults } = await searchEngineGenerateContent({ request, firstCall: false }));
+        break;
+
+      case getWikipediaContentFunctionDeclaration.name:
+        const wikiContent = await getWikipediaContent(functionCallArgs.subject);
+        if (!wikiContent) {
+          break;
+        }
+
+        request.contents.push({
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: getWikipediaContentFunctionDeclaration.name,
+                response: {name: getWikipediaContentFunctionDeclaration.name, content: wikiContent},
+              },
+            },
+          ]
+        });
+        ({ output, searchResults } = await searchEngineGenerateContent({ request, firstCall: false }));
+
+
+      default:
+        break;
     }
-  });
 
-  if (result?.response?.candidates[0]?.content?.parts[0].functionCall &&
-    result?.response?.candidates[0]?.content?.parts[0].functionCall.name === translateWithFoodContextFunctionDeclaration.name
-  ) {
-    console.log(JSON.stringify(result.response.candidates[0].content));
-    const call = result.response.candidates[0].content.parts[0].functionCall;
-    const jsonResponse = call.args;
-    return {
-      content: jsonResponse,
-      metadata: result.response.usageMetadata
-    };
+  // Disabling parallel function calling for now
+  } else if (candidates.length >= 2) {
+    searchResults = [];
+    output = `Could you ask a more specific question?`;
   }
 
   return {
-    content: translateWithFoodContextEmptyResponseCall(message, srcLang),
-    metadata: result.response.usageMetadata
-  };
+    output,
+    searchResults,
+  }
 }
 
+async function searchEngineGenerateContent({ request, firstCall = false }) {
+  const modelContent = await searchEngineModel.generateContent(request);
+  const response = modelContent.response;
+  let output = INVALID_RESULTS_MESSAGE, searchResults = [];
 
-// HTML Content
-app.use(express.static(path.join(__dirname, '../dist/chat-with-gemini/browser')));
+  // Only allow function call for first call - no recursive function calls
+  if (firstCall && isFunctionCall(response.candidates)){
+    ({ output, searchResults } = await functionCallLogic(request, response.candidates));
+  } else {
+    output = response?.candidates[0]?.content?.parts[0]?.text || INVALID_RESULTS_MESSAGE;
+  }
 
-app.get('*', (_, res) => {
-  res.sendFile(path.join(__dirname, '../dist/chat-with-gemini/browser/index.html'));
-});
-
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+  return {
+    output,
+    searchResults,
+  };
+}
