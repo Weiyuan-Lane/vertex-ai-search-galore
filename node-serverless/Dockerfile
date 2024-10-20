@@ -1,31 +1,31 @@
-# Use the official lightweight Node.js 18 image.
-# https://hub.docker.com/_/node
-FROM node:21.7.3-alpine3.19
+# Stage 1: Build Stage
+FROM node:22.10.0-alpine3.20 AS build
 
 # Create and change to the app directory.
-WORKDIR /usr/src/app/server
-
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this separately prevents re-running npm install on every code change.
-COPY package*.json /usr/src/app/
-COPY server/package*.json /usr/src/app/server/
-
-# Install dependencies.
-# If you add a package-lock.json speed your build by switching to 'npm ci'.
-# RUN npm ci --only=production
-RUN cd /usr/src/app &&\
-    npm install -g @angular/cli@latest &&\
-    npm install &&\
-    cd /usr/src/app/server &&\
-    npm install
+WORKDIR /opt/app
 
 # Copy local code to the container image.
-COPY . /usr/src/app/
+COPY . .
 
-# Build asset for angular app
-RUN cd /usr/src/app &&\
+# Install dependencies and build the Angular app
+RUN npm install -g @angular/cli@latest && \
+    npm install && \
     ng build
+
+# Stage 2: Production Stage
+FROM node:22.10.0-alpine3.20
+
+# Create and change to the app directory.
+WORKDIR /opt/app/server
+
+# Copy the built files from the build stage
+COPY --from=build /opt/app/dist /opt/app/dist
+
+# Copy the server code
+COPY --from=build /opt/app/server /opt/app/server
+
+# Install server dependencies
+RUN npm install
 
 # Run the web service on container startup.
 CMD ["node", "server.js"]

@@ -17,7 +17,10 @@ Concepts to cover in slides
 1. Vertex AI Search - using Vertex AI builder
   a. Use with discovery engine
   b. Bake with Reasoning engine
+  c. Import JSON files from Cloud Storage - format : https://cloud.google.com/generative-ai-app-builder/docs/prepare-data
 2. Vertex AI Studio
   a. Test prompts
   b. Induce grounding
   c. Use above outcome and bind together with results
+
+Search for - All dino and pixel merch and phone

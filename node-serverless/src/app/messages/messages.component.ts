@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Message } from '../../types/message';
+import { MerchResult, Message, PhoneResult } from '../../types/message';
 
 @Component({
   selector: 'app-messages',
@@ -13,6 +13,14 @@ import { Message } from '../../types/message';
 })
 export class MessagesComponent {
   @Input('messages') messages: Message[] = [];
+
+  getMerchContent(message: Message): MerchResult {
+    return message.content as MerchResult;
+  }
+
+  getPhoneContent(message: Message): PhoneResult {
+    return message.content as PhoneResult;
+  }
 
   getHourVal(date: Date): string {
     return `0${date.getHours()}`.slice(-2);

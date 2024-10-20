@@ -12,9 +12,9 @@ const searchServingConfig = `projects/${env.GOOGLE_CLOUD_PROJECT_NUMBER}/locatio
 const googleMerchStoreSearchDeclaration = {
   name: 'google_merch_store_search',
   description:`
-    Use this tool to only search for Google Merch Store products.
+    Use this tool to only search for Google Merch Store products, as well as Pixel and Android phone products.
 
-    Find a product with the productName and productDescription from Google Merch Shop and returns a dictionary containing product details.
+    Find a product with the productName and productDescription and returns a JSON object containing product details.
   `,
   parameters: {
     type: FunctionDeclarationSchemaType.OBJECT,

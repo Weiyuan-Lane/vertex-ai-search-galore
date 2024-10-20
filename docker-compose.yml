@@ -1,4 +1,36 @@
 services:
+  node-serverless-server:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: node-serverless/server/Dockerfile.dev
+    working_dir: /opt/app/server
+    container_name: node-serverless-server
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+      - NODE_ENV=development
+    volumes:
+      - ./node-serverless:/opt/app/
+      - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+    ports:
+      - 8080:8080
+
+  node-serverless-client:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: node-serverless/Dockerfile.dev
+    working_dir: /opt/app
+    container_name: node-serverless-client
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+      - NODE_ENV=development
+    volumes:
+      - ./node-serverless:/opt/app/
+      - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+    ports:
+      - 4200:4200
+
   python-setup:
     platform: linux/amd64
     build:

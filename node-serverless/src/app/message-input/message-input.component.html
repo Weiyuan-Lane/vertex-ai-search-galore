@@ -10,9 +10,13 @@
     [(ngModel)]=messageText
     (keyup)="onKeyup($event)"
     />
-  <div class="photo">
-    <i class="zmdi zmdi-camera"></i>
-  </div>
+  <button
+    class="mic"
+    (click)="submitAudioOption()">
+    <div class="photo">
+      <i class="zmdi zmdi-mic"></i>
+    </div>
+  </button>
   <button
     class="send"
     (click)="submitMessage()">

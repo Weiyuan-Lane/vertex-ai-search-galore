@@ -2,11 +2,16 @@ const {VertexAI} = require('@google-cloud/vertexai');
 const env = require('./config/env');
 const path = require('path');
 const marked = require('marked');
+const cors = require('cors');
 
 // Init express for this node server
 const express = require('express');
 const app = express();
 app.use(express.json());
+// Enable origin for angular in local environment
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors({ origin: 'http://localhost:4200' }));
+}
 
 // HTML Content
 app.use(express.static(path.join(__dirname, '../dist/chat-with-gemini/browser')));
@@ -48,10 +53,11 @@ app.post('/search', async (req, res) => {
     }
 
     // // Main post request to the search endpoint *******************************
-    const searchResponse = await searchWithNode(query);
+    const { message, results } = await searchWithNode(query);
+    const strippedMessage = message.replace(/\n\s*$/m, '');
     res.status(200).send({
-      message: searchResponse.message,
-      results: searchResponse.results,
+      message: strippedMessage,
+      results: results,
     });
     //*************************************************************************
 
@@ -165,7 +171,7 @@ async function functionCallLogic(priorRequest, candidates) {
     switch (functionCallName) {
       case googleMerchStoreSearchDeclaration.name:
         searchResults = await googleMerchStoreSearch(functionCallArgs.productName, functionCallArgs.productDescription);
-        output = `Found ${searchResults.length} results for ${functionCallArgs.productName} and ${functionCallArgs.productDescription}`;
+        output = `Found ${searchResults.length} results`;
         break;
 
       case getExchangeRateFunctionDeclaration.name:

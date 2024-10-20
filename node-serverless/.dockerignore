@@ -1,0 +1,6 @@
+.env
+env.js
+server/config/env.js
+node_modules
+server/node_modules
+dist
