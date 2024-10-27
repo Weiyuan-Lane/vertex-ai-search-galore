@@ -31,6 +31,22 @@ services:
     ports:
       - 4200:4200
 
+  python-serverless:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: python-serverless/Dockerfile.dev
+    working_dir: /opt/app
+    container_name: python-serverless
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+    volumes:
+      - ./python-serverless:/opt/app/
+      - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+      - .env:/opt/env/.env:ro
+    ports:
+      - 5000:5000
+
   python-setup:
     platform: linux/amd64
     build:

@@ -1,0 +1,4 @@
+google-cloud-aiplatform[langchain,reasoningengine]==1.70.0
+google-cloud-discoveryengine==0.12.3
+python-dotenv==1.0.1
+Flask==3.0.3

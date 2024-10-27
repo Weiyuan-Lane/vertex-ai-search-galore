@@ -1,0 +1,7 @@
+FROM python:3.9.20-alpine3.19
+
+COPY ./python-serverless/tools/flask-server.sh /opt/run/flask-server.sh
+RUN apk add --no-cache gcc libc-dev geos-dev geos &&\
+    pip3 install gunicorn
+
+ENTRYPOINT ["/opt/run/flask-server.sh"]

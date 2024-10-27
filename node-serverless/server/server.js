@@ -69,12 +69,12 @@ app.post('/search', async (req, res) => {
 
 // Initialize Vertex with your Cloud project and location
 const vertex_ai = new VertexAI({
-  project: env.GOOGLE_CLOUD_PROJECT,
-  location: env.GOOGLE_CLOUD_LOCATION
+  project: env.GCP_PROJECT_ID,
+  location: env.GCP_REGION
 });
 
 const searchEngineModel = vertex_ai.getGenerativeModel({
-  model: env.GEMINI_MODEL,
+  model: env.GCP_GEMINI_VER,
   systemInstruction: {
     role: 'system',
     parts: [{

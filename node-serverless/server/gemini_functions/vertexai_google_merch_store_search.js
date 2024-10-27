@@ -6,7 +6,7 @@ const env = require('../config/env');
 const searchClient = new SearchServiceClient({
   apiEndpoint: `${env.GCP_VERTEXAI_SEARCH_LOCATION}-discoveryengine.googleapis.com`,
 });
-const searchServingConfig = `projects/${env.GOOGLE_CLOUD_PROJECT_NUMBER}/locations/${env.GCP_VERTEXAI_SEARCH_LOCATION}/collections/default_collection/engines/${env.GCP_VERTEXAI_SEARCH_ENGINE_ID}/servingConfigs/default_search:search`
+const searchServingConfig = `projects/${env.GCP_PROJECT_ID_NUMBER}/locations/${env.GCP_VERTEXAI_SEARCH_LOCATION}/collections/default_collection/engines/${env.GCP_VERTEXAI_SEARCH_ENGINE_ID}/servingConfigs/default_search:search`
 
 // Function declaration
 const googleMerchStoreSearchDeclaration = {

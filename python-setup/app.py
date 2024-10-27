@@ -1,12 +1,11 @@
 import os
 import argparse
 import vertexai
+import requests
 from vertexai.preview import reasoning_engines
 from dotenv import load_dotenv
-import requests
 
 # Tools =======================================================================
-# from search_tools import wikipedia, vertexai_search, exchange_rate
 # from search_tools.wikipedia import query as wikipedia_query
 # from search_tools.vertexai_search import query as search_google_merch_shop_query
 # from search_tools.exchange_rate import query as exchange_rate_query
@@ -18,6 +17,7 @@ GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 GCP_REGION = os.getenv("GCP_REGION")
 GCP_GEMINI_VER = os.getenv("GCP_GEMINI_VER")
 GCP_VERTEXAI_REASONING_ENGINE_BUCKET = os.getenv("GCP_VERTEXAI_REASONING_ENGINE_BUCKET")
+GCP_PYTHON_SERVERLESS_URL = os.getenv("GCP_PYTHON_SERVERLESS_URL")
 
 vertexai.init(
   project=GCP_PROJECT_ID,
@@ -25,39 +25,26 @@ vertexai.init(
   staging_bucket=GCP_VERTEXAI_REASONING_ENGINE_BUCKET,
 )
 
-def currency_query(
-    currency_from: str,
-    currency_to: str
-):
+def vertex_ai_query(product_name: str, product_description: str):
   """
-  Use this tool to only retrieves the exchange rate between two currencies. Else don't use this tool.
+  Use this tool to only search for Google Merch Store products. Else don't use this tool.
 
-  Uses the Frankfurter API (https://api.frankfurter.app/) to obtain
-  exchange rate data.
-
-  Args:
-    currency_from: The base currency (3-letter currency code).
-      Defaults to "USD" (US Dollar).
-    currency_to: The target currency (3-letter currency code).
-      Defaults to "EUR" (Euro).
-
-  Returns:
-    dict: A dictionary containing the exchange rate information.
-      Example: {"amount": 1.0, "base": "USD", "date": "2023-11-24",
-        "rates": {"EUR": 0.95534}}
+  Find a product with the product_name and product_description from
+  Google Merch Shop and returns a dictionary containing product details.
   """
-  data = {}
-  try:
-    response = requests.get(
-      f"https://api.frankfurter.app/latest",
-      params={"base": currency_from, "symbols": currency_to},
-    )
-    data = response.json()
-  except Exception as e:
-    print(e)
-    return {"message": f"Sorry, I couldn't find the exchange rate between {currency_from} and {currency_to}."}
 
-  return data
+  query = product_name + " " + product_description
+  url = f"{GCP_PYTHON_SERVERLESS_URL}/search.json?query={query}&page=1&page_size=1"
+  results = requests.get(url).json()
+
+  target_result = results[0]['document']['structData']
+
+  productDetails = f"""
+    {target_result['gms_name']} is a product sold at Google Merch Shop. The price is {target_result['price']}.
+    {target_result['gms_desc']}. You can buy the product at their web site: {target_result['link']}"
+  """
+
+  return {"productDetails": productDetails}
 
 def get_agent():
   return reasoning_engines.LangchainAgent(
@@ -69,9 +56,7 @@ def get_agent():
       "top_k": None,
     },
     tools = [
-      # search_google_merch_shop_query,
-      currency_query,
-      # wikipedia_query,
+      vertex_ai_query
     ],
     agent_executor_kwargs={"return_intermediate_steps": True},
   )
@@ -91,21 +76,33 @@ def deploy_reasoning_engine():
 def list_deployed_reasoning_engines():
   print(reasoning_engines.ReasoningEngine.list())
 
+def query_remote(resource_id):
+  remote_app = reasoning_engines.ReasoningEngine(resource_id)
+  query = remote_app.query(input="Google Bike Enamel Pin. Where can I buy it? Write the answer in plaintext.")
+  print(f"\n input: {query['input']}")
+  print(f"output: {query['output']}")
+
 def delete_reasoning_engine(resource_id):
   remote_app = reasoning_engines.ReasoningEngine(resource_id)
   remote_app.delete()
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="Manage Reasoning Engines")
-  parser.add_argument("command", choices=["deploy", "list", "delete", "test"], help="Command to execute")
-  parser.add_argument("--resource_id", help="Resource ID for deletion")
+  parser.add_argument("command", choices=["deploy", "list", "delete", "test", "query_remote"], help="Command to execute")
+  parser.add_argument("--resource_id", help="Resource ID for remote instance")
 
   args = parser.parse_args()
+  print(args)
 
   if args.command == "deploy":
     deploy_reasoning_engine()
   elif args.command == "list":
     list_deployed_reasoning_engines()
+  elif args.command == "query_remote":
+    if args.resource_id is not None:
+      query_remote(args.resource_id)
+    else:
+      print("Please provide a resource ID for querying remote instance")
   elif args.command == "delete":
     if args.resource_id:
       delete_reasoning_engine(args.resource_id)
@@ -113,10 +110,6 @@ if __name__ == "__main__":
       print("Please provide a resource ID for deletion")
   elif args.command == "test":
     agent = get_agent()
-    # print(agent.query(input="Google Bike Enamel Pin. Where can I buy it? Write the answer in plaintext."))
-    query_1 = agent.query(input="What is the exchange rate between SGD and MYR.")
-    print(f"query 1 input: {query_1['input']}")
-    print(f"query 1 input: {query_1['output']}")
-    query_2 = agent.query(input="Can you tell me about Southeast Asia?")
-    print(f"query 2 input: {query_2['input']}")
-    print(f"query 2 input: {query_2['output']}")
+    query = agent.query(input="Google Bike Enamel Pin. Where can I buy it? Write the answer in plaintext.")
+    print(f"\n input: {query['input']}")
+    print(f"output: {query['output']}")

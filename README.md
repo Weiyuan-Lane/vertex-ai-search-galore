@@ -7,6 +7,7 @@ Part of the code is inspired from [Google's own Vertex AI Agent Builder & Flutte
 # Other references
 - https://www.googlecloudcommunity.com/gc/Community-Blogs/Building-and-Deploying-AI-Agents-with-LangChain-on-Vertex-AI/bc-p/770062
 - https://cloud.google.com/vertex-ai/generative-ai/docs/reasoning-engine/develop#langchain-tool
+- https://cloud.google.com/retail/docs/result-size
 
 ### "langchain" equivalence for reasoning engine
 - https://cloud.google.com/vertex-ai/generative-ai/docs/reference/python/latest/vertexai.preview.reasoning_engines.LangchainAgent?hl=en
@@ -24,3 +25,16 @@ Concepts to cover in slides
   c. Use above outcome and bind together with results
 
 Search for - All dino and pixel merch and phone
+
+docker image tag python-serverless-server:latest gcr.io/trygcp-ai-new/python-serverless-server:latest
+
+docker push gcr.io/trygcp-ai-new/python-serverless-server:latest
+
+
+make run_python_setup_command command=test
+
+make run_python_setup_command command=deploy
+
+make run_python_setup_command command=list
+
+make run_python_setup_command command=delete resource_id=12345

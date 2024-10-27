@@ -19,6 +19,9 @@ node-serverless/npm-debug.log
 node-serverless/server/yarn-error.log
 node-serverless/yarn-error.log
 
+# Python
+python-serverless/venv
+
 
 # IDEs and editors
 .idea/
