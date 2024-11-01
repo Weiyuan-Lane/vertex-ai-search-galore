@@ -115,7 +115,9 @@ export class AppComponent {
     language,
     voice,
   }: SpeechSynthesisUtteranceProps): SpeechSynthesisUtterance {
-    const utterance = new SpeechSynthesisUtterance(text);
+    const speechDiv = document.createElement('div');
+    speechDiv.innerHTML = text;
+    const utterance = new SpeechSynthesisUtterance(speechDiv.innerText);
 
     const voices = SpeechSynthesisApi.getVoices();
     const selectedVoice = voices.find((currentVoice) => {
