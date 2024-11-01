@@ -68,6 +68,7 @@ export class MessageInputComponent {
       const formattedResult = this.formatString(result);
 
       this.ngZone.run(() => {
+        // Easter egg for handsome
         if (this.isHandsome(formattedResult)){
           this.sendMessageEvent.emit({
             content: formattedResult,
@@ -76,7 +77,36 @@ export class MessageInputComponent {
           });
 
           this.sendMessageEvent.emit({
-            content: `Yes sir, you are very handsome`,
+            content: `Yes sir, you are very handsome. Or should I say`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+          });
+
+          this.sendMessageEvent.emit({
+            content: `đẹp trai`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+            audio: {
+              language: 'vi-VN',
+              voice: 'Linh',
+            }
+          });
+
+          return;
+        }
+
+        // Hello there
+        if (this.isHello(formattedResult)){
+          this.sendMessageEvent.emit({
+            content: formattedResult,
+            timestamp: new Date(),
+            state: 'me',
+          });
+
+          this.sendMessageEvent.emit({
+            content: `Yes sir, how can I help you?`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
@@ -111,5 +141,9 @@ export class MessageInputComponent {
 
   isHandsome(text: string): boolean {
     return text.toLowerCase().includes('handsome');
+  }
+
+  isHello(text: string): boolean {
+    return text.replace(/\n\s*$/m, '').toLowerCase() === 'hello';
   }
 }

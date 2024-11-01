@@ -102,12 +102,10 @@ export class AppComponent {
 
     // Speak only when triggered
     if (message.audioSynthesis) {
-      console.log(message.content);
       this.speechSynthesis({
         text: message.content as string,
-        language: 'en-GB',
-        voice: 'Daniel (English (United Kingdom))',
-        // voice: 'Grandpa (English (United Kingdom))',
+        language: message?.audio?.language || 'en-GB',
+        voice: message?.audio?.voice || 'Daniel (English (United Kingdom))',
       });
     }
   }

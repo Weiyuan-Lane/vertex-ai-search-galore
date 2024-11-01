@@ -28,6 +28,10 @@ type Message = {
   triggerSearch?: boolean;
   audioSynthesis?: boolean;
   delayAudioSynthesis?: boolean;
+  audio?: {
+    language: string;
+    voice: string;
+  }
 }
 
 export {
