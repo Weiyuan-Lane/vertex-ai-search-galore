@@ -77,22 +77,35 @@ export class MessageInputComponent {
           });
 
           this.sendMessageEvent.emit({
-            content: `Yes sir, you are very handsome. Or should I say`,
+            content: `Yes sir, you are very handsome. In fact, everyone here at this event is`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
           });
 
+          // Thai only
           this.sendMessageEvent.emit({
-            content: `đẹp trai`,
+            content: `หน้าตาดี`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
             audio: {
-              language: 'vi-VN',
-              voice: 'Linh',
+              language: 'th-TH',
+              voice: 'Kanya',
             }
           });
+
+          // Vietnamese only
+          // this.sendMessageEvent.emit({
+          //   content: `đẹp trai`,
+          //   timestamp: new Date(),
+          //   state: 'gemini',
+          //   audioSynthesis: true,
+          //   audio: {
+          //     language: 'vi-VN',
+          //     voice: 'Linh',
+          //   }
+          // });
 
           return;
         }
