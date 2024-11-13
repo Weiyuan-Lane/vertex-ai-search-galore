@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageInputComponent } from './message-input/message-input.component';
 import { MessagesComponent } from './messages/messages.component';
 import { Message, PhoneResult, MerchResult } from '../types/message';
+import { Router, NavigationEnd } from '@angular/router';
 
 let SpeechSynthesisApi: SpeechSynthesis;
 
@@ -35,6 +36,7 @@ type SpeechSynthesisUtteranceProps = {
 })
 export class AppComponent {
   title = 'search-with-gemini';
+  isRoot: boolean = false;
 
   @ViewChild('scroll', { read: ElementRef })
   public scroll!: ElementRef<any>;
@@ -42,7 +44,12 @@ export class AppComponent {
   public messages: Message[] = [];
   public loaderStatus: boolean = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isRoot = this.router.url === '/';
+      }
+    });
   }
 
   public scrollBottom() {

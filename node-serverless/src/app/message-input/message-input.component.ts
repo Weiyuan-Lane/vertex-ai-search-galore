@@ -83,9 +83,9 @@ export class MessageInputComponent {
             audioSynthesis: true,
           });
 
-          // ID only
+          // PH only
           this.sendMessageEvent.emit({
-            content: `cakep`,
+            content: `mabikas`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
@@ -94,6 +94,18 @@ export class MessageInputComponent {
               voice: 'Damayanti',
             }
           });
+
+          // // ID only
+          // this.sendMessageEvent.emit({
+          //   content: `cakep`,
+          //   timestamp: new Date(),
+          //   state: 'gemini',
+          //   audioSynthesis: true,
+          //   audio: {
+          //     language: 'id-ID',
+          //     voice: 'Damayanti',
+          //   }
+          // });
 
           // Thai only
           // this.sendMessageEvent.emit({

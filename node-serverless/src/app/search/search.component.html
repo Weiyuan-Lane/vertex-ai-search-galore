@@ -1,0 +1,101 @@
+<div *ngIf="isInitial" class="search-page">
+  <header>
+    <ul class="header-menu">
+      <li><a href="#grid"><img class="grid" src="https://cdn3.iconfinder.com/data/icons/navigation-and-settings/24/Material_icons-01-11-512.png" title="Google apps"></a></li>
+      <li><a class="links" href="https://www.ascenda.com/careers"><button class="signbutton" type="button">Ascenda.com/careers</button></a></li>
+      <li><a href="https://gdg.community.dev/events/details/google-gdg-cagayan-de-oro-presents-devfest-cagayan-de-oro-2024/">Devfest</a></li>
+      <li><a href="https://gdg.community.dev/gdg-cagayan-de-oro/">GDG Cagayan de Oro</a></li>
+    </ul>
+  </header>
+  <div class="logo">
+    <img alt="Google" src="/assets/handsome.png">
+  </div>
+  <div class="bar">
+    <input class="searchbar" type="text" title="Search" (keyup.enter)="search()" [(ngModel)]=searchText>
+    <a href="#"> <img class="voice" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Google_mic.svg/716px-Google_mic.svg.png" title="Search by Voice"></a>
+  </div>
+  <div class="buttons">
+    <button class="button" type="button">Google Search</button>
+    <button class="button" type="button">I'm Feeling Lucky</button>
+  </div>
+</div>
+
+<div *ngIf="!isInitial" class="search-results">
+    <div id="header">
+        <div id="topbar">
+            <img id="searchbarimage" src="/assets/handsome.png" />
+            <div id="searchbar" type="text">
+                <input id="searchbartext" type="text" (keyup.enter)="search()" [(ngModel)]=searchText/>
+                <button id="searchbarbutton">
+                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <ul class="header-menu">
+              <li><a href="#grid"><img class="grid" src="https://cdn3.iconfinder.com/data/icons/navigation-and-settings/24/Material_icons-01-11-512.png" title="Google apps"></a></li>
+              <li><a class="links" href="https://www.ascenda.com/careers"><button class="signbutton" type="button">Ascenda.com/careers</button></a></li>
+              <li><a href="https://gdg.community.dev/events/details/google-gdg-cagayan-de-oro-presents-devfest-cagayan-de-oro-2024/">Devfest</a></li>
+              <li><a href="https://gdg.community.dev/gdg-cagayan-de-oro/">GDG Cagayan de Oro</a></li>
+            </ul>
+        </div>
+        <div id="optionsbar">
+            <ul id="optionsmenu1">
+                <li id="optionsmenuactive">All</li>
+                <li>News</li>
+                <li>Videos</li>
+                <li>Images</li>
+                <li>Maps</li>
+                <li>More</li>
+            </ul>
+
+            <ul id="optionsmenu2">
+                <li>Settings</li>
+                <li>Tools</li>
+            </ul>
+        </div>
+    </div>
+    <div style="margin-top: 20px; margin-left: 190px; clear: both;" *ngIf="searching">
+      <mat-spinner
+        [color]="'accent'"
+        [diameter]="40">
+      </mat-spinner>
+    </div>
+
+    <mat-card class="example-card" appearance="outlined" *ngIf="geminiResponse.length > 0">
+      <mat-card-header>
+        <div mat-card-avatar>
+          <img src="/assets/gemini-logo.webp" style="max-width: 40px;" alt="Avatar">
+        </div>
+        <mat-card-title>Gemini</mat-card-title>
+        <mat-card-subtitle>Ask me anything</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p [innerHtml]="geminiResponse">
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="!searching" id="searchresultsarea">
+        <p *ngIf="resultCount > 0" id="searchresultsnumber">About {{ resultCount }} results ({{ secondsTaken }} seconds) </p>
+        <p *ngIf="resultCount === 0" id="searchresultsnumber">No results found ({{ secondsTaken }} seconds) </p>
+
+        <div *ngFor="let result of results">
+          <div *ngIf="result.state === 'gemini-result-merch'" class="searchresult">
+            <h2>{{ getMerchContent(result).name.stringValue }}</h2>
+            <a href="{{ getMerchContent(result).link.stringValue }}">{{ getMerchContent(result).link.stringValue }}</a> <button>▼</button>
+            <p>{{ getMerchContent(result).gms_desc.stringValue }}</p>
+            <p>Price: {{ getMerchContent(result).price.stringValue }}</p>
+          </div>
+
+          <div *ngIf="result.state === 'gemini-result-phone'" class="searchresult">
+            <h2>{{ getPhoneContent(result).name.stringValue }}</h2>
+            <a href="{{ getPhoneContent(result).link.stringValue }}">{{ getPhoneContent(result).link.stringValue }}</a> <button>▼</button>
+            <p>Price: {{ getMerchContent(result).price.stringValue }}</p>
+          </div>
+        </div>
+    </div>
+</div>
