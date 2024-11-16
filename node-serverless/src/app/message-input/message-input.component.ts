@@ -85,7 +85,7 @@ export class MessageInputComponent {
 
           // PH only
           this.sendMessageEvent.emit({
-            content: `mabikas`,
+            content: `matikas`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
