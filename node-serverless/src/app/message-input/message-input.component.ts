@@ -84,28 +84,28 @@ export class MessageInputComponent {
           });
 
           // EN only
-          this.sendMessageEvent.emit({
-            content: `Handsome`,
-            timestamp: new Date(),
-            state: 'gemini',
-            audioSynthesis: true,
-            audio: {
-              language: 'en-GB',
-              voice: 'Rocko (English (United Kingdom))',
-            }
-          });
-
-          // // PH only
           // this.sendMessageEvent.emit({
-          //   content: `matikas`,
+          //   content: `Handsome`,
           //   timestamp: new Date(),
           //   state: 'gemini',
           //   audioSynthesis: true,
           //   audio: {
-          //     language: 'id-ID',
-          //     voice: 'Damayanti',
+          //     language: 'en-GB',
+          //     voice: 'Rocko (English (United Kingdom))',
           //   }
           // });
+
+          // // PH only
+          this.sendMessageEvent.emit({
+            content: `matikas`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+            audio: {
+              language: 'id-ID',
+              voice: 'Damayanti',
+            }
+          });
 
           // // ID only
           // this.sendMessageEvent.emit({
