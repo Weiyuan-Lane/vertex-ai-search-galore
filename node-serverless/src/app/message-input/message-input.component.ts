@@ -77,10 +77,22 @@ export class MessageInputComponent {
           });
 
           this.sendMessageEvent.emit({
-            content: `Yes sir, you are very handsome. In fact, everyone here at this event is`,
+            content: `Yes sir, you are very handsome. In fact, some uncles and aunties might even call you...`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
+          });
+
+          // Cantonese only
+          this.sendMessageEvent.emit({
+            content: `靚仔`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+            audio: {
+              language: 'zh-HK',
+              voice: 'Sinji',
+            }
           });
 
           // EN only
@@ -96,16 +108,16 @@ export class MessageInputComponent {
           // });
 
           // // PH only
-          this.sendMessageEvent.emit({
-            content: `matikas`,
-            timestamp: new Date(),
-            state: 'gemini',
-            audioSynthesis: true,
-            audio: {
-              language: 'id-ID',
-              voice: 'Damayanti',
-            }
-          });
+          // this.sendMessageEvent.emit({
+          //   content: `matikas`,
+          //   timestamp: new Date(),
+          //   state: 'gemini',
+          //   audioSynthesis: true,
+          //   audio: {
+          //     language: 'id-ID',
+          //     voice: 'Damayanti',
+          //   }
+          // });
 
           // // ID only
           // this.sendMessageEvent.emit({
