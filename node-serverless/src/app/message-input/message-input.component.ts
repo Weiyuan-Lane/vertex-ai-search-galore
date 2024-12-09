@@ -77,23 +77,35 @@ export class MessageInputComponent {
           });
 
           this.sendMessageEvent.emit({
-            content: `Yes sir, you are very handsome. In fact, some uncles and aunties might even call you...`,
+            content: `Yes sir, you are very handsome. In fact, some uncles and aunties might even say`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
           });
 
-          // Cantonese only
+          // Why is this combination sound so sarcastic, lol
           this.sendMessageEvent.emit({
-            content: `靚仔`,
+            content: `Wow, you so "yan dao" 🙄`,
             timestamp: new Date(),
             state: 'gemini',
             audioSynthesis: true,
             audio: {
               language: 'zh-HK',
-              voice: 'Sinji',
+              voice: 'Google 粤語（香港）',
             }
           });
+
+          // Cantonese only
+          // this.sendMessageEvent.emit({
+          //   content: `靚仔`,
+          //   timestamp: new Date(),
+          //   state: 'gemini',
+          //   audioSynthesis: true,
+          //   audio: {
+          //     language: 'zh-HK',
+          //     voice: 'Sinji',
+          //   }
+          // });
 
           // EN only
           // this.sendMessageEvent.emit({
@@ -158,6 +170,26 @@ export class MessageInputComponent {
           return;
         }
 
+        if (this.isDoubtful(formattedResult)) {
+          this.sendMessageEvent.emit({
+            content: formattedResult,
+            timestamp: new Date(),
+            state: 'me',
+          });
+
+          this.sendMessageEvent.emit({
+            content: `Why you buay paiseh`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+            audio: {
+              language: 'zh-HK',
+              voice: 'Google 粤語（香港）',
+            }
+          });
+          return;
+        }
+
         // Hello there
         if (this.isHello(formattedResult)){
           this.sendMessageEvent.emit({
@@ -202,6 +234,10 @@ export class MessageInputComponent {
 
   isHandsome(text: string): boolean {
     return text.toLowerCase().includes('handsome');
+  }
+
+  isDoubtful(text: string): boolean {
+    return text.toLowerCase().includes('what do you mean');
   }
 
   isHello(text: string): boolean {
