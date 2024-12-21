@@ -84,28 +84,28 @@ export class MessageInputComponent {
           });
 
           // Why is this combination sound so sarcastic, lol
-          this.sendMessageEvent.emit({
-            content: `Wow, you so "yan dao" 🙄`,
-            timestamp: new Date(),
-            state: 'gemini',
-            audioSynthesis: true,
-            audio: {
-              language: 'zh-HK',
-              voice: 'Google 粤語（香港）',
-            }
-          });
-
-          // Cantonese only
           // this.sendMessageEvent.emit({
-          //   content: `靚仔`,
+          //   content: `Wow, you so "yan dao" 🙄`,
           //   timestamp: new Date(),
           //   state: 'gemini',
           //   audioSynthesis: true,
           //   audio: {
           //     language: 'zh-HK',
-          //     voice: 'Sinji',
+          //     voice: 'Google 粤語（香港）',
           //   }
           // });
+
+          // Cantonese only
+          this.sendMessageEvent.emit({
+            content: `靚仔`,
+            timestamp: new Date(),
+            state: 'gemini',
+            audioSynthesis: true,
+            audio: {
+              language: 'zh-HK',
+              voice: 'Sinji',
+            }
+          });
 
           // EN only
           // this.sendMessageEvent.emit({
