@@ -94,3 +94,6 @@ Once the docker images are ready, check out the [Cloud Run documentation](https:
 # End
 
 Have fun with playing with these Vertex AI tools in Google Cloud
+
+### Disclaimer
+Google Cloud credits are provided for this project #VertexAISprint
